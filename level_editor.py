@@ -30,7 +30,7 @@ def unregister():
 
      #Blenderからクラスを削除
     for cls in classes:
-        bpy.utils.register_class(cls)
+        bpy.utils.unregister_class(cls)
     print("レベルエディタが無効化されました。")
 
 #テスト実行用コード
