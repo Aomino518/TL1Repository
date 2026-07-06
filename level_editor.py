@@ -32,18 +32,18 @@ def register():
 
     print("レベルエディタが有効化されました。")
         
-#アドオン無効化時のコールバック
+# アドオン無効化時のコールバック
 def unregister():
     bpy.types.TOPBAR_MT_editor_menus.remove(TOPBAR_MT_my_menu.submenu)
     # 3Dビューから描画関数を削除
     bpy.types.SpaceView3D.draw_handler_remove(DrawCollider.handle,"WINDOW")
 
-     #Blenderからクラスを削除
+    # Blenderからクラスを削除
     for cls in classes:
         bpy.utils.unregister_class(cls)
     print("レベルエディタが無効化されました。")
 
-#テスト実行用コード
+# テスト実行用コード
 if __name__ == "__main__":
     register()
 
@@ -262,21 +262,21 @@ class DrawCollider:
                 # 頂点データリストに座標を追加
                 vertices['pos'].append(pos)
 
-                #前面を構成する点の頂点インデックス
-                indices.append([start + 0, start + 1])
-                indices.append([start + 2, start + 3])
-                indices.append([start + 0, start + 2])
-                indices.append([start + 1, start + 3])
-                #奥面を構成する頂点インデックス
-                indices.append([start + 4, start + 5])
-                indices.append([start + 6, start + 7])
-                indices.append([start + 4, start + 6])
-                indices.append([start + 5, start + 7])
-                #手前と奥を繋ぐ辺の頂点インデックス
-                indices.append([start + 0, start + 4])
-                indices.append([start + 1, start + 5])
-                indices.append([start + 2, start + 6])
-                indices.append([start + 3, start + 7])
+            #前面を構成する点の頂点インデックス
+            indices.append([start + 0, start + 1])
+            indices.append([start + 2, start + 3])
+            indices.append([start + 0, start + 2])
+            indices.append([start + 1, start + 3])
+            #奥面を構成する頂点インデックス
+            indices.append([start + 4, start + 5])
+            indices.append([start + 6, start + 7])
+            indices.append([start + 4, start + 6])
+            indices.append([start + 5, start + 7])
+            #手前と奥を繋ぐ辺の頂点インデックス
+            indices.append([start + 0, start + 4])
+            indices.append([start + 1, start + 5])
+            indices.append([start + 2, start + 6])
+            indices.append([start + 3, start + 7])
 
         # ビルトインのシェーダを取得
         shader = gpu.shader.from_builtin("UNIFORM_COLOR")
