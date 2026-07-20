@@ -1,0 +1,97 @@
+{
+    "name": "scene",
+    "objects": [
+        {
+            "type": "MESH",
+            "name": "ball",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    2.1210103034973145
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "ball",
+            "children": [
+                {
+                    "type": "MESH",
+                    "name": "axis",
+                    "transform": {
+                        "translation": [
+                            3.154143810272217,
+                            2.1115708351135254,
+                            1.3307747840881348
+                        ],
+                        "rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "scaling": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ]
+                    },
+                    "file_name": "axis",
+                    "children": [
+                        {
+                            "type": "MESH",
+                            "name": "axis.001",
+                            "transform": {
+                                "translation": [
+                                    5.054605960845947,
+                                    1.9362525939941406,
+                                    2.317502975463867
+                                ],
+                                "rotation": [
+                                    0.0,
+                                    -0.0,
+                                    0.0
+                                ],
+                                "scaling": [
+                                    1.0,
+                                    1.0,
+                                    1.0
+                                ]
+                            },
+                            "file_name": "axis"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "MESH",
+            "name": "Plane",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "terrain"
+        }
+    ]
+}

@@ -7,7 +7,9 @@
 #include <vector>
 #include <map>
 #include "Logger.h"
+#include "LevelData.h"
 
+class Entity3D;
 class ModelManager
 {
 public:
@@ -31,11 +33,16 @@ public:
 	/// <returns>モデル</returns>
 	Model* FindModel(const std::string& filePath);
 
+	std::string FindModelFile(const std::string& name);
+
 	// Getter
 	bool GetIsModelLighting() const { return this->isModelLighting_; }
 
 	// Setter
 	void SetIsLighting(bool isLighting);
+
+	void ApplyLevelData(const std::string& filePath);
+	std::unique_ptr<Entity3D> CreateEntityRecursive(const LevelData::ObjectData& obj);
 
 private:
 	ModelManager() = default;

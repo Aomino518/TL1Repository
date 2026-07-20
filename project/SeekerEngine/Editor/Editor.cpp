@@ -22,6 +22,25 @@ Editor* Editor::GetInstance()
 	return &instance;
 }
 
+void Editor::Update()
+{
+	for (auto& [name, entity] : models_) {
+		if (entity && entity->GetParent() == nullptr) {
+			entity->SetCamera(CameraManager::GetInstance()->GetActiveCamera());
+			entity->Update();
+		}
+	}
+}
+
+void Editor::Draw3D()
+{
+	for (auto& [name, entity] : models_) {
+		if (entity) {
+			entity->Draw();
+		}
+	}
+}
+
 void Editor::Draw()
 {
 #ifdef USE_IMGUI
@@ -35,9 +54,9 @@ void Editor::RegisterSprite(const std::string& name, Sprite* sprite)
 	sprites_[name] = sprite;
 }
 
-void Editor::RegisterModel(const std::string& name, Entity3D* model)
+void Editor::RegisterModel(const std::string& name, std::unique_ptr<Entity3D> model)
 {
-	models_[name] = model;
+	models_[name] = std::move(model);
 }
 
 void Editor::RegisterParticle(const std::string& name)
@@ -86,7 +105,7 @@ void Editor::SaveSceneJson(const std::string& path) const
 		json managerJson = Particle2DManager::GetInstance()->SaveToJson(name);
 
 		particle2DJson["blendMode"] = managerJson["blendMode"];
-		
+
 		root["particles2D"][name] = particle2DJson;
 	}
 
@@ -134,7 +153,8 @@ void Editor::LoadSceneJson(const std::string& path)
 	json root;
 	try {
 		ifs >> root;
-	} catch (const nlohmann::json::parse_error& e) {
+	}
+	catch (const nlohmann::json::parse_error& e) {
 		Logger::Write(Logger::LogLevel::Warning, "Failed to parse json. Keep current scene values: " + std::string(e.what()));
 		return;
 	}
@@ -143,7 +163,7 @@ void Editor::LoadSceneJson(const std::string& path)
 		Logger::Write(Logger::LogLevel::Warning, "Json is empty. Keep current scene values.");
 		return;
 	}
-	
+
 	if (root.contains("isLighting") && root["isLighting"].is_boolean()) {
 		ModelManager::GetInstance()->SetIsLighting(root["isLighting"].get<bool>());
 	}
@@ -227,6 +247,9 @@ void Editor::ClearSceneJson(const std::string& path)
 
 void Editor::Clear()
 {
+	selectedEntity_ = nullptr;
+	selection_ = {};
+
 	sprites_.clear();
 	models_.clear();
 	particles_.clear();
@@ -234,6 +257,17 @@ void Editor::Clear()
 	WorldFieldManager::GetInstance()->AllRemoveField();
 	WorldField2DManager::GetInstance()->AllRemoveField();
 	selection_ = {};
+}
+
+void Editor::ModelClear()
+{
+	selectedEntity_ = nullptr;
+
+	if (selection_.category == InspectorCategory::Model) {
+		selection_ = {};
+	}
+
+	models_.clear();
 }
 
 void Editor::DrawHierarchy()
@@ -267,10 +301,8 @@ void Editor::DrawHierarchy()
 	// =========================
 	if (ImGui::CollapsingHeader("Model", ImGuiTreeNodeFlags_DefaultOpen)) {
 		for (auto& [name, model] : models_) {
-			bool selected = (selection_.category == InspectorCategory::Model && selection_.name == name);
-			if (ImGui::Selectable(name.c_str(), selected)) {
-				selection_.category = InspectorCategory::Model;
-				selection_.name = name;
+			if (model) {
+				DrawEntityHierarchy(model.get());
 			}
 		}
 	}
@@ -398,11 +430,29 @@ void Editor::DrawInspector()
 
 	case InspectorCategory::Model:
 	{
-		auto it = models_.find(selection_.name);
-		if (it != models_.end()) {
-			ImGui::Text("Name: %s", it->first.c_str());
-			it->second->DrawImGui();
+		if (selectedEntity_) {
+			ImGui::Text(
+				"Name: %s",
+				selectedEntity_->GetName().c_str()
+			);
+
+			if (selectedEntity_->GetParent()) {
+				ImGui::Text(
+					"Parent: %s",
+					selectedEntity_->GetParent()->GetName().c_str()
+				);
+			} else {
+				ImGui::Text("Parent: None");
+			}
+
+			ImGui::SeparatorText("Loacl Transform");
+
+			selectedEntity_->DrawImGui();
+
+		} else {
+			ImGui::Text("No model selected.");
 		}
+
 		break;
 	}
 
@@ -466,5 +516,53 @@ void Editor::DrawInspector()
 	}
 
 	ImGui::End();
+#endif
+}
+
+void Editor::DrawEntityHierarchy(Entity3D* entity)
+{
+#ifdef USE_IMGUI
+	if (!entity) {
+		return;
+	}
+
+	const auto& children = entity->GetChildren();
+
+	ImGuiTreeNodeFlags flags =
+		ImGuiTreeNodeFlags_OpenOnArrow |
+		ImGuiTreeNodeFlags_OpenOnDoubleClick |
+		ImGuiTreeNodeFlags_SpanAvailWidth;
+
+	if (children.empty()) {
+		flags |= ImGuiTreeNodeFlags_Leaf;
+		flags |= ImGuiTreeNodeFlags_NoTreePushOnOpen;
+	}
+
+	if (selectedEntity_ == entity) {
+		flags |= ImGuiTreeNodeFlags_Selected;
+	}
+
+	ImGui::PushID(entity);
+
+	const bool isOpen = ImGui::TreeNodeEx(
+		entity->GetName().c_str(),
+		flags
+	);
+
+	if (ImGui::IsItemClicked()) {
+		selection_.category = InspectorCategory::Model;
+		selection_.name = entity->GetName();
+		selectedEntity_ = entity;
+	}
+
+	if (!children.empty() && isOpen) {
+		for (const auto& child : children) {
+			DrawEntityHierarchy(child.get());
+		}
+
+		ImGui::TreePop();
+	}
+
+	ImGui::PopID();
 #endif
 }

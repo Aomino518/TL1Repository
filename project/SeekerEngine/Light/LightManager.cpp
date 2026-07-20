@@ -22,7 +22,7 @@ void LightManager::Init()
     // 初期化値
     dirLight_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
     dirLight_->direction = { 1.0f, 0.0f, 0.0f };
-    dirLight_->intensity = 0.0f;
+    dirLight_->intensity = 1.0f;
 
     pointLightGroupResource_ = CreateBufferResource(Graphics::GetDevice(), sizeof(PointLightGroup));
     pointLightGroupResource_->Map(0, nullptr, reinterpret_cast<void**>(&pointLightGroup_));

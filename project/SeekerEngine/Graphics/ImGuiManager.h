@@ -73,5 +73,6 @@ private:
 	bool requestSavePopup_ = false;
 	bool requestLoadPopup_ = false;
 	bool requestClearPopup_ = false;
+	bool requestLoadLevelDataPopup_ = false;
 };
 

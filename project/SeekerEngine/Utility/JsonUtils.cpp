@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <assert.h>
 #include "Logger.h"
+#include "LevelData.h"
 
 namespace JsonUtils {
     std::string JsonUtils::ReadFilePath(const std::string& path)

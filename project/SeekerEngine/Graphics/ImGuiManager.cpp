@@ -11,6 +11,7 @@
 #include "ParticleManager.h"
 #include "Particle2DManager.h"
 #include "Emitter2DManager.h"
+#include "ModelManager.h"
 #include "SrvManager.h"
 #include "Editor.h"
 #include "Vector3.h"
@@ -225,6 +226,10 @@ void ImGuiManager::DrawMainMenuBar()
 				requestClearPopup_ = true;
 			}
 
+			if (ImGui::MenuItem("LoadLevel")) {
+				requestLoadLevelDataPopup_ = true;
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -252,6 +257,11 @@ void ImGuiManager::DrawMainMenuBar()
 	if (requestClearPopup_) {
 		ImGui::OpenPopup("Confirm Clear");
 		requestClearPopup_ = false;
+	}
+
+	if (requestLoadLevelDataPopup_) {
+		ImGui::OpenPopup("Confirm LoadLevel");
+		requestLoadLevelDataPopup_ = false;
 	}
 
 	DrawConfirmPopup();
@@ -528,6 +538,23 @@ void ImGuiManager::DrawConfirmPopup()
 
 		if (ImGui::Button("OK", ImVec2(120, 0))) {
 			ClearScenesJson();
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	if (ImGui::BeginPopupModal("Confirm LoadLevel", nullptr, flags)) {
+		ImGui::Text("現在の編集内容を破棄してロードしますか？");
+
+		if (ImGui::Button("OK", ImVec2(120, 0))) {
+			ModelManager::GetInstance()->ApplyLevelData("levelData.json");
 			ImGui::CloseCurrentPopup();
 		}
 

@@ -309,6 +309,9 @@
     <ClCompile Include="Game\Base\SceneFactory.cpp">
       <Filter>ソース ファイル\Application\Base</Filter>
     </ClCompile>
+    <ClCompile Include="SeekerEngine\Utility\LoadLevelData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\hlsl\Object2D.PS.hlsl">
@@ -780,6 +783,12 @@
     </ClInclude>
     <ClInclude Include="Game\Base\Game.h">
       <Filter>ヘッダー ファイル\Application\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="SeekerEngine\Utility\LevelData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SeekerEngine\Utility\LoadLevelData.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

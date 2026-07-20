@@ -26,8 +26,11 @@ public:
 	// 初期化
 	void Init();
 
-	// 更新
-	void Update();
+	/// <summary>
+	/// 更新関数
+	/// </summary>
+	/// <param name="parentWorldMatrix">親のワールド行列</param>
+	void Update(const Matrix4x4* parentWorldMatrix = nullptr);
 
 	// 描画
 	void Draw();
@@ -61,6 +64,16 @@ public:
 
 	void DrawImGui();
 
+	// 親子関係用
+	void SetParent(Entity3D* parent) { parent_ = parent; }
+	Entity3D* GetParent() const { return parent_; }
+	void AddChild(std::unique_ptr<Entity3D> child);
+	const std::vector<std::unique_ptr<Entity3D>>& GetChildren() const { return children_; }
+	Matrix4x4 GetWorldMatrix() const;
+	// Entity3Dそれぞれが持つ名前のGetterとSetter
+	std::string GetName() { return name_; }
+	void SetName(const std::string& name) { name_ = name; }
+
 private:
 	void ModelResourcesSetting();
 
@@ -87,5 +100,11 @@ private:
 
 	// ブレンドモード取得
 	BlendMode mode_ = kBlendModeNone;
+
+	// 親子関係用
+	Entity3D* parent_ = nullptr;
+	std::vector<std::unique_ptr<Entity3D>> children_;
+	Matrix4x4 lastCulculatedWorldMatrix_ = MakeIdentity4x4();
+	std::string name_ = "";
 };
 

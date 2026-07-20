@@ -59,7 +59,30 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 	Assimp::Importer importer;
 	std::string	filePath = directoryPath + "/" + filename + "/" + filename + "." + extension;
 	Logger::Write(filePath);
-	const aiScene* scene = importer.ReadFile(filePath.c_str(), aiProcess_FlipWindingOrder | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(
+		filePath.c_str(), 
+		aiProcess_MakeLeftHanded | 
+		aiProcess_FlipWindingOrder | 
+		aiProcess_FlipUVs | 
+		aiProcess_JoinIdenticalVertices
+	);
+
+	if (!scene) {
+		Logger::Write(
+			Logger::LogLevel::Error,
+			"Assimp load failed: " + filePath +
+			"\nReason: " + importer.GetErrorString()
+		);
+		return;
+	}
+
+	if (!scene->HasMeshes()) {
+		Logger::Write(
+			Logger::LogLevel::Error,
+			"Model has no meshes: " + filePath
+		);
+		return;
+	}
 
 	assert(scene->HasMeshes()); // メッシュがないのは対応しない
 
@@ -75,8 +98,8 @@ void Model::LoadObjFile(const std::string& directoryPath, const std::string& fil
 			aiVector3D& uv = mesh->mTextureCoords[0][i];
 
 			VertexData vertex{};
-			vertex.position = { -p.x, p.y, p.z, 1.0f };
-			vertex.normal = { -n.x, n.y, n.z };
+			vertex.position = { p.x, p.y, p.z, 1.0f };
+			vertex.normal = { n.x, n.y, n.z };
 			vertex.texcoord = { uv.x, uv.y };
 
 			modelData_.vertices.push_back(vertex);

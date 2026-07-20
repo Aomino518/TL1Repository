@@ -1,8 +1,7 @@
 #pragma once
 #include <string>
-#include "Vector2.h"
 #include "Vector3.h"
-#include "Vector4.h"
+#include <nlohmann/json.hpp>
 
 namespace JsonUtils
 {

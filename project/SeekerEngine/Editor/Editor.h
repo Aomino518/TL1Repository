@@ -32,11 +32,15 @@ class Editor
 public:
     static Editor* GetInstance();
 
+    void Update();
+
+    void Draw3D();
+
 	void Draw();
 
     // 登録
     void RegisterSprite(const std::string& name, Sprite* sprite);
-    void RegisterModel(const std::string& name, Entity3D* model);
+    void RegisterModel(const std::string& name, std::unique_ptr<Entity3D> model);
     void RegisterParticle(const std::string& name);
     void RegisterParticle2D(const std::string& name);
 
@@ -46,6 +50,7 @@ public:
     void ClearSceneJson(const std::string& path);
 
     void Clear();
+    void ModelClear();
 
 private:
     Editor() = default;
@@ -55,11 +60,17 @@ private:
 
 	void DrawHierarchy();
 	void DrawInspector();
+    
+    // Entity3Dの親子構造で再帰表示する
+    void DrawEntityHierarchy(Entity3D* entity);
 
     InspectorSelection selection_;
 
+    // Hierarchyで現在選択されているEntity3D
+    Entity3D* selectedEntity_ = nullptr;
+
     std::unordered_map<std::string, Sprite*> sprites_;
-    std::unordered_map<std::string, Entity3D*> models_;
+    std::unordered_map<std::string, std::unique_ptr<Entity3D>> models_;
     std::unordered_map<std::string, ParticleEmitter*> particles_;
     std::unordered_map<std::string, Particle2DEmitter*> particles2D_;
 };

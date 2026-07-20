@@ -4,8 +4,11 @@
 void TitleScene::Init()
 {
     Logger::Write("現在シーンTitleScene");
+    auto camMgr = CameraManager::GetInstance();
+    Entity3DCommon::GetInstance()->SetCameraManager(camMgr);
+    Entity3DCommon::GetInstance()->SetDebugCamera(camMgr->GetDebugCamera());
    
-    ImGuiManager::GetInstance()->LoadScenesJson();
+    //ImGuiManager::GetInstance()->LoadScenesJson();
 }
 
 void TitleScene::Update()
@@ -20,6 +23,8 @@ void TitleScene::Update()
         SceneManager::GetInstance()->ChangeScene("GAMEPLAY");
     }
 
+    Editor::GetInstance()->Update();
+
     ImGuiManager::GetInstance()->BeginFrame();
     ImGuiManager::GetInstance()->DrawMainMenuBar();
     ImGuiManager::GetInstance()->DrawCameraWindow(camMgr);
@@ -32,6 +37,7 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
+    Editor::GetInstance()->Draw3D();
     ImGuiManager::GetInstance()->Draw();
 }
 

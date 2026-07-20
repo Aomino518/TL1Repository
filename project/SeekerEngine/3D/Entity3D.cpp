@@ -1,6 +1,5 @@
 #include "Entity3D.h"
 #include "Entity3DCommon.h"
-#include "TextureManager.h"
 #include "ModelManager.h"
 #include "JsonTransform.h"
 #include "JsonMath.h"
@@ -17,9 +16,19 @@ void Entity3D::Init()
 	transform_ = { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 }
 
-void Entity3D::Update()
+void Entity3D::Update(const Matrix4x4* parentWorldMatrix)
 {
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix;
+	Matrix4x4 localMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	// 親子関係の行列計算
+	if (parentWorldMatrix) {
+		worldMatrix = Multiply(localMatrix, *parentWorldMatrix);
+	} else {
+		worldMatrix = localMatrix;
+	}
+
+	lastCulculatedWorldMatrix_ = worldMatrix;
+
 	// WVPMatrixを作る
 	Matrix4x4 worldViewProjectionMatrix;
 	// RootNode取得
@@ -46,7 +55,7 @@ void Entity3D::Update()
 
 	transformationMatrixData_->World = modelData.rootNode.localMatrix * worldMatrix;
 	transformationMatrixData_->WVP = modelData.rootNode.localMatrix * worldViewProjectionMatrix;
-	transformationMatrixData_->WorldInverseTranspose = worldInverseTransform;
+	transformationMatrixData_->WorldInverseTranspose = Transpose(worldInverseTransform);;
 
 	if (cameraData_) {
 		if (isDebug) {
@@ -56,6 +65,10 @@ void Entity3D::Update()
 		} else if (camera_) {
 			cameraData_->worldPosition = camera_->GetTranslate();
 		}
+	}
+
+	for (auto& child : children_) {
+		child->Update(&worldMatrix);
 	}
 }
 
@@ -73,6 +86,11 @@ void Entity3D::Draw()
 
 	if (model_) {
 		model_->Draw();
+	}
+
+	// 子オブジェクトを再帰的に描画
+	for (auto& child : children_) {
+		child->Draw();
 	}
 }
 
@@ -146,4 +164,14 @@ void Entity3D::DrawImGui() {
 	ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&material));
 	model_->SetMaterial(material);
 #endif
+}
+
+void Entity3D::AddChild(std::unique_ptr<Entity3D> child) {
+	child->SetParent(this);
+	children_.push_back(std::move(child));
+}
+
+Matrix4x4 Entity3D::GetWorldMatrix() const {
+	ModelData modelData = model_->GetRootNode();
+	return modelData.rootNode.localMatrix * lastCulculatedWorldMatrix_;
 }
