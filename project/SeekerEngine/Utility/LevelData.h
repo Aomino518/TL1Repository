@@ -12,6 +12,7 @@ public:
 		Vector3 rotation;
 		Vector3 scaling;
 		std::vector<ObjectData> children;
+		bool disabled;
 	};
 
 	std::vector<ObjectData> objects;

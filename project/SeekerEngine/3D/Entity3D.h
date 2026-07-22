@@ -49,6 +49,7 @@ public:
 	const Vector3& GetLightDirection() const { return directionalLightData_->direction; }
 	const Vector3& GetPointLightPos() const { return pointLightData_->position; }
 	const Transform& GetTransform() const { return transform_; }
+	const bool& GetIsDisabled() const { return isDisabled_; }
 
 	// setter関数
 	void SetModel(const std::string& filePath);
@@ -61,6 +62,7 @@ public:
 	void SetLightDirection(const Vector3& pos) { this->directionalLightData_->direction = pos; }
 	void SetPointLightPos(const Vector3& pos) { this->pointLightData_->position = pos; }
 	void SetTransform(const Transform& transform) { this->transform_ = transform; }
+	void SetIsDisabled(const bool isDisabled) { this->isDisabled_ = isDisabled; }
 
 	void DrawImGui();
 
@@ -106,5 +108,8 @@ private:
 	std::vector<std::unique_ptr<Entity3D>> children_;
 	Matrix4x4 lastCulculatedWorldMatrix_ = MakeIdentity4x4();
 	std::string name_ = "";
+
+	// 描画するかのフラグ
+	bool isDisabled_ = false;
 };
 

@@ -58,6 +58,10 @@ LevelData::ObjectData ParseObject(const nlohmann::json& object)
         objectData.fileName = object["file_name"];
     }
 
+	if (object.contains("disabled")) {
+		objectData.disabled = object["disabled"];
+	}
+
 	if (objectData.name.empty()) {
 		objectData.name = objectData.fileName;
 	}

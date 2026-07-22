@@ -67,8 +67,10 @@ void Entity3D::Update(const Matrix4x4* parentWorldMatrix)
 		}
 	}
 
-	for (auto& child : children_) {
-		child->Update(&worldMatrix);
+	if (!isDisabled_) {
+		for (auto& child : children_) {
+			child->Update(&worldMatrix);
+		}
 	}
 }
 
@@ -84,13 +86,15 @@ void Entity3D::Draw()
 	cmdList_->SetGraphicsRootConstantBufferView(5, LightManager::GetInstance()->GetPointLightGroupResource()->GetGPUVirtualAddress());
 	cmdList_->SetGraphicsRootConstantBufferView(6, LightManager::GetInstance()->GetSpotLightGroupResource()->GetGPUVirtualAddress());
 
-	if (model_) {
+	if (model_ && !isDisabled_) {
 		model_->Draw();
 	}
 
 	// 子オブジェクトを再帰的に描画
-	for (auto& child : children_) {
-		child->Draw();
+	if (!isDisabled_) {
+		for (auto& child : children_) {
+			child->Draw();
+		}
 	}
 }
 
@@ -162,6 +166,7 @@ void Entity3D::DrawImGui() {
 	ImGui::DragFloat3("Rotation", reinterpret_cast<float*>(&transform_.rotate), 0.01f);
 	ImGui::DragFloat3("Scale", reinterpret_cast<float*>(&transform_.scale), 0.01f, 0.0f);
 	ImGui::ColorEdit4("Color", reinterpret_cast<float*>(&material));
+	ImGui::Checkbox("isDisabled", &isDisabled_);
 	model_->SetMaterial(material);
 #endif
 }

@@ -108,7 +108,7 @@ void ModelManager::ApplyLevelData(const std::string& filePath)
 	for (auto& obj : levelData->objects) {
 		auto rootEntity = CreateEntityRecursive(obj);
 		if (rootEntity) {
-			Editor::GetInstance()->RegisterModel(obj.fileName, std::move(rootEntity));
+			Editor::GetInstance()->RegisterModel(obj.name, std::move(rootEntity));
 		}
 	}
 }
@@ -132,7 +132,7 @@ std::vector<std::string> ModelManager::Split(std::string str, char del)
 }
 
 std::unique_ptr<Entity3D> ModelManager::CreateEntityRecursive(const LevelData::ObjectData& obj) {
-	Logger::Write("Create entity: " + obj.fileName);
+	Logger::Write("Create entity: " + obj.fileName + "," + obj.name + "," + "disbled:" + std::string(obj.disabled ? "true" : "false"));
 
 	if (obj.fileName.empty()) {
 		Logger::Write(
@@ -144,10 +144,13 @@ std::unique_ptr<Entity3D> ModelManager::CreateEntityRecursive(const LevelData::O
 
 	std::string modelNamePath = FindModelFile(obj.fileName);
 
-	Logger::Write(
-		"Found model path: " +
-		(modelNamePath.empty() ? std::string("[EMPTY]") : modelNamePath)
-	);
+	if (modelNamePath.empty()) {
+		Logger::Write(
+			Logger::LogLevel::Error,
+			"Model file not found:" + obj.fileName
+		);
+		return nullptr;
+	}
 
 	LoadModel(modelNamePath);
 	std::unique_ptr<Entity3D> entity = std::make_unique<Entity3D>();
@@ -158,6 +161,7 @@ std::unique_ptr<Entity3D> ModelManager::CreateEntityRecursive(const LevelData::O
 	entity->SetRotate(obj.rotation);
 	entity->SetScale(obj.scaling);
 	entity->SetName(obj.name);
+	entity->SetIsDisabled(obj.disabled);
 
 	for (const auto& childData : obj.children) {
 		auto childEntity = CreateEntityRecursive(childData);
